@@ -29,7 +29,6 @@ module.exports = (req, res, next) => {
         error.statusCode = 401;
         throw error;
     }
-    console.log(decodedToken);
 
     // الانتقال إلى middleware التالي
     next();
