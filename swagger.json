@@ -1,402 +1,374 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "version": "1.0.0",
-        "title": "CRUD Comments Operations",
-        "description": "API for managing comments in the system"
+      "version": "1.0.0",
+      "title": "CRUD Comments Operations",
+      "description": "API for managing comments in the system"
     },
     "servers": [
-        {
-            "url": "http://localhost:8080",
-            "description": "Local Development or Heroku"
-        }
+      {
+        "url": "http://localhost:8080",
+        "description": "Local Development"
+      },
+      {
+        "url": "https://comments-akyu.onrender.com",
+        "description": "Production Server"
+      }
     ],
     "tags": [
-        {
-            "name": "Comment",
-            "description": "API for handling comments"
-        },
-        {
-            "name": "User",
-            "description": "API for user management"
-        },
-        {
-            "name": "Auth",
-            "description": "API for authentication and user registration"
-        }
+      {
+        "name": "Comment",
+        "description": "API for handling comments"
+      },
+      {
+        "name": "User",
+        "description": "API for user management"
+      },
+      {
+        "name": "Auth",
+        "description": "API for authentication and user registration"
+      }
     ],
     "paths": {
-        "/comments/all-comment": {
-            "get": {
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "default": 1,
-                        "required": true,
-                        "description": "Page number for pagination",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "required": true,
-                        "default": 10,
-                        "description": "Number of comments to return per page",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "status",
-                        "description": "Filter comments by status",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "toDate",
-                        "description": "Filter comments by a date range (to date)",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "fromDate",
-                        "description": "Filter comments by a date range (from date)",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "userId",
-                        "description": "Filter comments by user ID",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "keyword",
-                        "description": "Filter comments by keyword in the description",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    }
-                ],
-                "tags": [
-                    "Comment"
-                ],
-                "summary": "Get all comments in the system",
-                "responses": {
-                    "200": {
-                        "description": "List of comments",
-                        "schema": {
-                            "$ref": "#/definitions/Comments"
-                        }
-                    }
-                }
+      "/comment/all-comment": {
+        "get": {
+          "parameters": [
+            {
+              "in": "query",
+              "name": "page",
+              "default": 1,
+              "required": true,
+              "description": "Page number for pagination",
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "in": "query",
+              "name": "limit",
+              "required": true,
+              "default": 10,
+              "description": "Number of comments to return per page",
+              "schema": {
+                "type": "integer"
+              }
+            },
+            {
+              "in": "query",
+              "name": "keyword",
+              "description": "Filter comments by keyword in the description",
+              "schema": {
+                "type": "string"
+              }
+            },
+            {
+              "in": "query",
+              "name": "fromDate",
+              "description": "Filter comments by a date range (from date)",
+              "schema": {
+                "type": "string",
+                "format": "date-time"
+              }
+            },
+            {
+              "in": "query",
+              "name": "toDate",
+              "description": "Filter comments by a date range (to date)",
+              "schema": {
+                "type": "string",
+                "format": "date-time"
+              }
             }
-        },
-        "/comments/add-comment": {
-            "post": {
-                "tags": [
-                    "Comment"
-                ],
-                "summary": "Create a new comment in the system",
-                "requestBody": {
-                    "description": "Comment data",
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/definitions/Comment"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Comment successfully created",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    "400": {
-                        "description": "Bad request, invalid data"
-                    }
-                }
-            }
-        },
-        "/comments/user-comments/{userId}": {
-            "get": {
-                "parameters": [
-                    {
-                        "in": "query",
-                        "name": "page",
-                        "default": 1,
-                        "required": true,
-                        "description": "Page number for pagination",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "limit",
-                        "required": true,
-                        "default": 10,
-                        "description": "Number of comments per page",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    {
-                        "in": "query",
-                        "name": "status",
-                        "description": "Filter comments by status",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    {
-                        "in": "path",
-                        "name": "userId",
-                        "description": "User ID to filter comments",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    }
-                ],
-                "tags": [
-                    "User"
-                ],
-                "summary": "Get all comments for a specific user",
-                "responses": {
-                    "200": {
-                        "description": "List of user comments",
-                        "schema": {
-                            "$ref": "#/definitions/Comment"
-                        }
-                    }
-                }
-            }
-        },
-        "/comments/comment/{id}": {
-            "get": {
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "description": "ID of the comment to fetch",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    }
-                ],
-                "tags": [
-                    "Comment"
-                ],
-                "summary": "Get details of a specific comment",
-                "responses": {
-                    "200": {
-                        "description": "Comment details",
-                        "schema": {
-                            "$ref": "#/definitions/Comment"
-                        }
-                    }
-                }
-            }
-        },
-        "/comments/edit-comment/{id}": {
-            "put": {
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "description": "ID of the comment to edit",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    }
-                ],
-                "tags": [
-                    "Comment"
-                ],
-                "summary": "Edit an existing comment",
-                "requestBody": {
-                    "description": "Updated comment data",
-                    "required": true,
-                    "content": {
-                        "multipart/form-data": {
-                            "schema": {
-                                "$ref": "#/definitions/Comment"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Comment updated",
-                        "schema": {
-                            "$ref": "#/definitions/Comment"
-                        }
-                    }
-                }
-            }
-        },
-        "/comments/delete-comment/{id}": {
-            "delete": {
-                "parameters": [
-                    {
-                        "in": "path",
-                        "name": "id",
-                        "description": "ID of the comment to delete"
-                    }
-                ],
-                "tags": [
-                    "Comment"
-                ],
-                "summary": "Delete a specific comment",
-                "responses": {
-                    "200": {
-                        "description": "Comment deleted",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    }
-                }
-            }
-        },
-        "/auth/login": {
-            "post": {
-                "tags": [
-                    "Auth"
-                ],
-                "summary": "Login to the system",
-                "requestBody": {
-                    "description": "Login credentials",
-                    "required": true,
-                    "content": {
-                        "application/json": {
-                            "schema": {
-                                "$ref": "#/definitions/Login"
-                            }
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Login successful",
-                        "schema": {
-                            "$ref": "#/definitions/id"
-                        }
-                    },
-                    "400": {
-                        "description": "Invalid login data"
-                    }
-                }
-            }
-        }
-    },
-    "definitions": {
-        "id": {
-            "type": "object",
-            "properties": {
-                "id": {
-                    "type": "string"
-                }
-            }
-        },
-        "Comment": {
-            "type": "object",
-            "properties": {
-                "comment": {
-                    "type": "string"
-                },
-                "userId": {
-                    "type": "string"
-                },
-                "createdAt": {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "updatedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "ratings": {
+          ],
+          "tags": ["Comment"],
+          "summary": "Get all comments in the system",
+          "responses": {
+            "200": {
+              "description": "List of comments",
+              "content": {
+                "application/json": {
+                  "schema": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/Rating"
+                      "$ref": "#/components/schemas/Comment"
                     }
+                  }
                 }
+              }
             }
+          },
+          "security": [
+            {
+              "BearerAuth": []
+            }
+          ]
+        }
+      },
+      "/comment/add-comment": {
+        "post": {
+          "tags": ["Comment"],
+          "summary": "Create a new comment in the system",
+          "requestBody": {
+            "description": "Comment data",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Comment successfully created",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request, invalid data"
+            }
+          },
+          "security": [
+            {
+              "BearerAuth": []
+            }
+          ]
+        }
+      },
+      "/comment/add-rating/{commentId}": {
+        "post": {
+          "tags": ["Comment"],
+          "summary": "Add a rating to a comment",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "commentId",
+              "required": true,
+              "description": "ID of the comment to rate",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "description": "Rating data",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Rating"
+                }
+              }
+            }
+          },
+          "responses": {
+            "201": {
+              "description": "Rating added successfully",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request, invalid data"
+            }
+          },
+          "security": [
+            {
+              "BearerAuth": []
+            }
+          ]
+        }
+      },
+      "/comment/edit-comment/{id}": {
+        "put": {
+          "tags": ["Comment"],
+          "summary": "Edit an existing comment",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "required": true,
+              "description": "ID of the comment to edit",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "requestBody": {
+            "description": "Updated comment data",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Comment"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Comment updated",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Bad request, invalid data"
+            }
+          },
+          "security": [
+            {
+              "BearerAuth": []
+            }
+          ]
+        }
+      },
+      "/comment/delete-comment/{id}": {
+        "delete": {
+          "tags": ["Comment"],
+          "summary": "Delete a specific comment",
+          "parameters": [
+            {
+              "in": "path",
+              "name": "id",
+              "required": true,
+              "description": "ID of the comment to delete",
+              "schema": {
+                "type": "string"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Comment deleted"
+            },
+            "404": {
+              "description": "Comment not found"
+            }
+          },
+          "security": [
+            {
+              "BearerAuth": []
+            }
+          ]
+        }
+      },
+      "/auth/login": {
+        "post": {
+          "tags": ["Auth"],
+          "summary": "Login to the system",
+          "requestBody": {
+            "description": "Login credentials",
+            "required": true,
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Login"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Login successful",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/LoginResponse"
+                  }
+                }
+              }
+            },
+            "400": {
+              "description": "Invalid login data"
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "Comment": {
+          "type": "object",
+          "properties": {
+            "comment": {
+              "type": "string"
+            },
+            "userId": {
+              "type": "string"
+            },
+            "createdAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "updatedAt": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "ratings": {
+              "type": "array",
+              "items": {
+                "$ref": "#/components/schemas/Rating"
+              }
+            }
+          }
         },
         "Rating": {
-            "type": "object",
-            "properties": {
-                "userId": {
-                    "type": "string"
-                },
-                "rating": {
-                    "type": "integer",
-                    "minimum": 1,
-                    "maximum": 5
-                }
+          "type": "object",
+          "properties": {
+            "userId": {
+              "type": "string"
+            },
+            "rating": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 5
             }
-        },
-        "User": {
-            "type": "object",
-            "properties": {
-                "username": {
-                    "type": "string"
-                },
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                },
-                "firstName": {
-                    "type": "string"
-                },
-                "lastName": {
-                    "type": "string"
-                },
-                "profilePicture": {
-                    "type": "string"
-                },
-                "role": {
-                    "type": "string",
-                    "enum": ["user", "admin"]
-                },
-                "createdAt": {
-                    "type": "string",
-                    "format": "date-time"
-                },
-                "updatedAt": {
-                    "type": "string",
-                    "format": "date-time"
-                }
-            }
+          }
         },
         "Login": {
-            "type": "object",
-            "properties": {
-                "email": {
-                    "type": "string"
-                },
-                "password": {
-                    "type": "string"
-                }
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string"
             }
+          }
+        },
+        "LoginResponse": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string"
+            },
+            "userId": {
+              "type": "string"
+            }
+          }
         }
+      },
+      "securitySchemes": {
+        "BearerAuth": {
+          "type": "http",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
     }
-}
+  }
