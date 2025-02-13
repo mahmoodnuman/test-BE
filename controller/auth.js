@@ -58,7 +58,7 @@ exports.login = async (req, res, next) => {
                 userId: userLogedIn._id.toString()
             },
             process.env.JWT_SECRET, // استخدم المتغير البيئي هنا
-            { expiresIn: "1h" }
+            { expiresIn: "10h" }
         );
         
 

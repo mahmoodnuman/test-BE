@@ -1,19 +1,19 @@
+require('dotenv').config();
 const jwt = require('jsonwebtoken');
-const secretKey = process.env.JWT_SECRET_KEY; // يجب تعريف secretKey في ملف .env
+const secretKey = process.env.JWT_SECRET;
 
 module.exports = (req, res, next) => {
     let decodedToken;
-
+    console.log(secretKey);
     // التحقق من وجود token في header
     if (!req.get('Authorization')) {
         const error = new Error("Not Authenticated: No token provided.");
         error.statusCode = 401;
         throw error;
-    }
+    }   
 
     // استخراج token من header
     const token = req.get('Authorization').split(' ')[1];
-
     try {
         // فك تشفير token
         decodedToken = jwt.verify(token, secretKey);
@@ -24,12 +24,12 @@ module.exports = (req, res, next) => {
         throw err;
     }
 
-    // التحقق من أن token تم فك تشفيره بنجاح
     if (!decodedToken) {
         const error = new Error("Not Authenticated: Token verification failed.");
         error.statusCode = 401;
         throw error;
     }
+    console.log(decodedToken);
 
     // الانتقال إلى middleware التالي
     next();
