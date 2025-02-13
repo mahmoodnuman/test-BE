@@ -3,7 +3,7 @@ const route = express.Router()
 const {body} = require('express-validator')
 const User = require('../models/users')
 const authControllers = require('../controller/auth')
-const isAuth = require('../middlware/is-auth')
+const isAuth = require('../middleware/is-auth')
 const usersFilter = require('../controller/users-filter')
 
 route.post('/login',
@@ -30,5 +30,6 @@ route.post('/login',
  
  // حذف مستخدم
  route.delete('/user/:id', isAuth, authControllers.deleteUser);
+ 
  
  module.exports = route;

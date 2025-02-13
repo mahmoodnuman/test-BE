@@ -4,124 +4,152 @@ const userSchema = require('../models/users');
 const path = require('path');
 const fs = require('fs');
 
-exports.getComments = (req, res, next) => {
-    const currentPage = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    let totalItems;
+// الحصول على جميع التعليقات مع ترقيم الصفحات
+exports.getComments = async (req, res, next) => {
+    try {
+        const currentPage = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 10;
+        const totalItems = await commentSchema.countDocuments();
+        const result = await commentSchema.find()
+            .skip((currentPage - 1) * limit)
+            .limit(limit)
+            .sort({ createdAt: -1 });
 
-    commentSchema.countDocuments().then(count => {
-        totalItems = count;
-        return commentSchema.find().skip((currentPage - 1) * limit).limit(limit).sort({ createdAt: -1 });
-    }).then(result => {
         res.status(200).json({
             comments: result,
             totalItems: totalItems
         });
-    }).catch(err => {
+    } catch (err) {
         next(err);
-    });
+    }
 };
 
-exports.createComment = (req, res, next) => {
-    const err = validationResult(req);
-    if (!err.isEmpty()) {
+// إضافة تعليق جديد
+exports.createComment = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
         return res.status(400).json({
-            message: "Comment is invalid",
-            errors: err.array()
+            message: "Validation failed",
+            errors: errors.array()
         });
     }
 
-    if (!req.body.userId) {
-        const error = new Error('User ID is required');
-        error.statusCode = 400;
-        return next(error);
-    }
+    try {
+        const newComment = new commentSchema({
+            comment: req.body.comment,
+            userId: req.userData.userId, // يتم تعيين userId من المستخدم المسجل
+            createdAt: Date.now(),
+        });
 
-    const newComment = new commentSchema({
-        comment: req.body.comment,
-        userId: req.body.userId,
-        createdAt: Date.now(),
-    });
-
-    newComment.save().then(() => {
+        await newComment.save();
         res.status(201).json({
-            message: "Comment Created Successfully"
+            message: "Comment Created Successfully",
+            comment: newComment
         });
-    }).catch(err => {
+    } catch (err) {
         next(err);
-    });
+    }
 };
 
-exports.editComment = (req, res, next) => {
-    const err = validationResult(req);
-    if (!err.isEmpty()) {
+// إضافة تقييم للتعليق
+exports.addRating = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
         return res.status(400).json({
-            message: "Comment is invalid",
-            errors: err.array()
+            message: "Validation failed",
+            errors: errors.array()
+        });
+    }
+
+    const { commentId } = req.params;
+    const { rating } = req.body;
+
+    try {
+        const comment = await commentSchema.findById(commentId);
+        if (!comment) {
+            const error = new Error("No Comment Found With This ID...");
+            error.statusCode = 404;
+            throw error;
+        }
+
+        // إضافة التقييم دون التحقق من التقييمات السابقة
+        comment.ratings.push({ userId: req.userData.userId, rating });
+        const result = await comment.save();
+        
+        res.status(201).json({
+            message: "Rating Added Successfully",
+            comment: result
+        });
+    } catch (err) {
+        next(err);
+    }
+};
+
+// تعديل تعليق (مفتوح للمسؤولين فقط)
+exports.editComment = async (req, res, next) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            message: "Validation failed",
+            errors: errors.array()
         });
     }
 
     const commentId = req.params.id;
     const updatedComment = req.body.comment;
 
-    commentSchema.findByIdAndUpdate(commentId, { comment: updatedComment }, { new: true }).then(result => {
+    try {
+        const result = await commentSchema.findByIdAndUpdate(commentId, { comment: updatedComment }, { new: true });
         if (!result) {
             const error = new Error("No Comment Found With This ID...");
             error.statusCode = 404;
-            return next(error);
+            throw error;
         }
         res.status(200).json({
-            message: "Comment Updated Successfully"
+            message: "Comment Updated Successfully",
+            comment: result
         });
-    }).catch(err => {
+    } catch (err) {
         next(err);
-    });
+    }
 };
 
-exports.deleteComment = (req, res, next) => {
+// حذف تعليق (مفتوح للمسؤولين فقط)
+exports.deleteComment = async (req, res, next) => {
     const commentId = req.params.id;
 
-    commentSchema.findByIdAndRemove(commentId).then(result => {
+    try {
+        const result = await commentSchema.findByIdAndRemove(commentId);
         if (!result) {
             const error = new Error("No Comment Found With This ID...");
             error.statusCode = 404;
-            return next(error);
+            throw error;
         }
         res.status(200).json({ message: "Comment Deleted Successfully" });
-    }).catch(err => {
+    } catch (err) {
         next(err);
-    });
+    }
 };
 
-exports.getUserComments = (req, res, next) => {
+// الحصول على تعليقات مستخدم معين
+exports.getUserComments = async (req, res, next) => {
     const currentPage = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
 
-    commentSchema.find({ userId: req.userData.userId }).countDocuments().then(count => {
+    try {
+        const count = await commentSchema.find({ userId: req.userData.userId }).countDocuments();
         if (!count) {
             const error = new Error("No Comments Found For This User...");
-            error.statusCode = 400;
-            return next(error);
+            error.statusCode = 404;
+            throw error;
         }
-        return commentSchema.find({ userId: req.userData.userId }).skip((currentPage - 1) * limit).limit(limit).sort({ createdAt: -1 });
-    }).then(result => {
+        const result = await commentSchema.find({ userId: req.userData.userId })
+            .skip((currentPage - 1) * limit)
+            .limit(limit)
+            .sort({ createdAt: -1 });
+
         res.status(200).json({ comments: result });
-    }).catch(err => {
+    } catch (err) {
         next(err);
-    });
-};
-
-exports.commentDetails = (req, res, next) => {
-    const commentId = req.params.id;
-
-    commentSchema.findById(commentId).then(result => {
-        if (!result) {
-            const error = new Error("No Comment Found With This ID...");
-            error.statusCode = 400;
-            return next(error);
-        }
-        res.status(200).json({ comment: result });
-    }).catch(err => {
-        next(err);
-    });
+    }
 };

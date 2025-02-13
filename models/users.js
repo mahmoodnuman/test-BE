@@ -35,7 +35,7 @@ const userSchema = new schema({
     role: {
         type: String,
         enum: ['user', 'admin'],
-        default: 'admin'
+        default: 'user' // القيمة الافتراضية هي 'user'
     },
     createdAt: {
         type: Date,
@@ -45,6 +45,5 @@ const userSchema = new schema({
         type: Date
     }
 }, { timestamps: true });
-
 
 module.exports = mongoose.model('User', userSchema);
