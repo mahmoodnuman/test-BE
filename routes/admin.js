@@ -12,6 +12,7 @@ route.get('/all-comment', isAuth, commentsFilter.filter, commentsControllers.get
 // الحصول على تعليقات مستخدم معين (مفتوح للمستخدمين والمسؤولين)
 route.get('/user-comment/:id', isAuth, commentsFilter.filter, commentsControllers.getUserComments);
 
+
 // إضافة تعليق جديد (مفتوح للمستخدمين فقط)
 route.post(
     '/add-comment',
@@ -44,6 +45,7 @@ route.put(
     ],
     commentsControllers.editComment
 );
+
 
 // حذف تعليق (مفتوح للمسؤولين فقط)
 route.delete('/delete-comment/:id', isAuth, isAdmin, commentsControllers.deleteComment);

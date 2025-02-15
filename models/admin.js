@@ -34,24 +34,17 @@ const commentSchema = new schema({
     updatedAt: {
         type: Date
     },
-    ratings: [ratingSchema] // Array to store ratings from users
+    ratings: [ratingSchema], // Array to store ratings from users
+    averageRating: { // إضافة حقل averageRating
+        type: Number,
+        default: 0
+    }
 }, { timestamps: true });
 
 // إضافة hook لتحديث `updatedAt` عند تعديل التعليق
 commentSchema.pre('save', function(next) {
     if (this.isModified('comment')) {
         this.updatedAt = Date.now();
-    }
-    next();
-});
-
-// إضافة تحقق من التقييمات للتأكد من أن كل مستخدم يمكنه تقييم التعليق مرة واحدة فقط
-commentSchema.pre('save', function(next) {
-    if (this.isModified('ratings')) {
-        const userIds = this.ratings.map(rating => rating.userId.toString());
-        if (new Set(userIds).size !== userIds.length) {
-            return next(new Error('Each user can rate only once per comment'));
-        }
     }
     next();
 });
