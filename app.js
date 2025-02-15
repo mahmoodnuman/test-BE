@@ -9,9 +9,9 @@ const path = require("path"); // للتعامل مع مسارات الملفات
 const swaggerUi = require('swagger-ui-express'); // لتوثيق API
 const swaggerDocument = require('./swagger.json'); // ملف توثيق Swagger
 require("dotenv").config(); // لتحميل المتغيرات البيئية
-
+const cors = require('cors');
+app.use(cors());
 const port = process.env.PORT || 3000; // استخدام المتغير البيئي أو القيمة الافتراضية
-
 // إعدادات multer لتحميل الصور
 const fileStorage = multer.diskStorage({
   destination: (req, file, cb) => {
