@@ -18,7 +18,6 @@ route.post(
     '/add-comment',
     isAuth,
     [
-        body('title').trim().isLength({ max: 255, min: 5 }).withMessage('العنوان يجب أن يكون بين 5 و 255 حرفًا'),
         body('comment').trim().isLength({ min: 1 }).withMessage('التعليق لا يمكن أن يكون فارغًا')
     ],
     commentsControllers.createComment
@@ -40,7 +39,6 @@ route.put(
     isAuth,
     isAdmin, // فقط المسؤول يمكنه تعديل التعليق
     [
-        body('title').trim().isLength({ max: 255, min: 5 }).withMessage('العنوان يجب أن يكون بين 5 و 255 حرفًا'),
         body('comment').trim().isLength({ min: 1 }).withMessage('التعليق لا يمكن أن يكون فارغًا')
     ],
     commentsControllers.editComment
