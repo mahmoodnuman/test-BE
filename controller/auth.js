@@ -124,6 +124,7 @@ exports.register = (req, res, next) => {
     });
 };
 
+
 exports.getUsers = (req , res , next) => {
     let currentPage = req.query.page,
     limit = req.query.limit;

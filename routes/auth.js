@@ -26,7 +26,7 @@ route.post('/login',
  route.get('/users', isAuth, usersFilter.userfilter, authControllers.getUsers);
  
  // تغيير حالة المستخدم
- route.put('/user-status', isAuth, authControllers.changeUserStatus);
+ route.put('/user-status/:id', isAuth, authControllers.changeUserStatus);
  
  // حذف مستخدم
  route.delete('/user/:id', isAuth, authControllers.deleteUser);
