@@ -124,41 +124,6 @@ exports.register = (req, res, next) => {
     });
 };
 
-// exports.login = async (req, res, next) => {
-//     const { email, password } = req.body;
-
-//     try {
-//         // تحقق من وجود المستخدم في قاعدة البيانات
-//         const user = await User.findOne({ email });
-//         if (!user) {
-//             const error = new Error("Invalid email or password");
-//             error.statusCode = 401;
-//             throw error;
-//         }
-
-//         // تحقق من كلمة المرور
-//         const isMatch = await user.isPasswordCorrect(password);
-//         if (!isMatch) {
-//             const error = new Error("Invalid email or password");
-//             error.statusCode = 401;
-//             throw error;
-//         }
-
-//         // إذا كانت بيانات الدخول صحيحة، قم بتوليد التوكن
-//         const token = jwt.sign(
-//             { userId: user._id, role: user.role }, // تأكد من تضمين role في التوكن
-//             process.env.JWT_SECRET || 'defaultSecret',
-//             { expiresIn: '1h' } // التوكن ينتهي بعد ساعة
-//         );
-
-//         // إرسال التوكن في الاستجابة
-//         res.status(200).json({ token: token });
-
-//     } catch (error) {
-//         next(error);
-//     }
-// };
-
 exports.getUsers = (req , res , next) => {
     let currentPage = req.query.page,
     limit = req.query.limit;
