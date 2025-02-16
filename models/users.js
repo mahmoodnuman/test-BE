@@ -37,6 +37,10 @@ const userSchema = new schema({
         enum: ['user', 'admin'],
         default: 'user' // القيمة الافتراضية هي 'user'
     },
+    isActive: {
+        type: Boolean,
+        default: false // تعيين الحالة الافتراضية إلى غير مفعلة
+    },
     createdAt: {
         type: Date,
         default: Date.now
