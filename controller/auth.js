@@ -176,26 +176,24 @@ exports.deleteUser = (req, res, next) => {
 
 }
 
-exports.changeUserStatus = (req , res , next) => {
-
-    let userId = req.body.id,
+exports.changeUserStatus = (req, res, next) => {
+    let userId = req.params.id, // استخدم params بدلاً من body للحصول على الـ ID
         currentStatus = req.body.status;
-
-        User.findById(userId).then(result => {
-           if(!result) {
-            const err = new Error("A user with this email could be not found");
-            err.StatusCode = 401;
-            throw err
-           } 
-           User.findByIdAndUpdate(userId).then(user => {
-            user.status = (currentStatus == "Active") ? "In-Active" : "Active"
-            return user.save()
-           
-           }).then(success => {
-                res.status(200).json({
-                    user: success,
-                    massage:"User Status Changed Successfully"
-                })
-           })
-        })
-}
+  
+    User.findById(userId).then(result => {
+      if (!result) {
+        const err = new Error("A user with this email could not be found");
+        err.statusCode = 401;
+        throw err;
+      }
+      result.status = currentStatus === "Active" ? "Inactive" : "Active";
+      return result.save();
+    }).then(updatedUser => {
+      res.status(200).json({
+        user: updatedUser,
+        message: "User Status Changed Successfully"
+      });
+    }).catch(err => {
+      next(err);
+    });
+  };  
