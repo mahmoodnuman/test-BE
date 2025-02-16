@@ -21,6 +21,16 @@ route.post('/login',
      body('lastName').trim().notEmpty().withMessage("Last name is required."),
      authControllers.register
  );
+
+ route.put('/user/:id', isAuth, 
+    body('email').trim().isEmail().withMessage("Please enter a valid email").normalizeEmail(),
+    body('username').trim().notEmpty().withMessage("Username is required."),
+    body('firstName').trim().notEmpty().withMessage("First name is required."),
+    body('lastName').trim().notEmpty().withMessage("Last name is required."),
+    body('role').trim().notEmpty().withMessage("Role is required."),
+    authControllers.updateUser
+  );
+  
  
  // عرض المستخدمين
  route.get('/users', isAuth, usersFilter.userfilter, authControllers.getUsers);

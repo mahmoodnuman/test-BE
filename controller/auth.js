@@ -200,4 +200,42 @@ exports.changeUserStatus = (req, res, next) => {
       next(err); // تمرير الخطأ إلى المعالج التالي
     });
   };
+
+  exports.updateUser = (req, res, next) => {
+    const userId = req.params.id;
+    const { email, username, firstName, lastName, role } = req.body;
+  
+    // التحقق من وجود البيانات
+    if (!email || !username || !firstName || !lastName || !role) {
+      const error = new Error('All fields are required');
+      error.statusCode = 400;
+      throw error;
+    }
+  
+    User.findById(userId).then(user => {
+      if (!user) {
+        const error = new Error('User not found');
+        error.statusCode = 404;
+        throw error;
+      }
+  
+      // تحديث البيانات
+      user.email = email;
+      user.username = username;
+      user.firstName = firstName;
+      user.lastName = lastName;
+      user.role = role;
+  
+      // حفظ البيانات المعدلة
+      return user.save();
+    }).then(updatedUser => {
+      res.status(200).json({
+        message: 'User updated successfully',
+        user: updatedUser
+      });
+    }).catch(err => {
+      next(err);
+    });
+  };
+  
   
