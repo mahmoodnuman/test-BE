@@ -8,7 +8,7 @@ const fs = require('fs');
 exports.getComments = async (req, res, next) => {
     try {
         const currentPage = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10; // يمكنك تركها فقط للصفحات ولكن ليست ضرورية الآن لجميع التعليقات.
+        const limit = parseInt(req.query.limit) || 5; // يمكنك تركها فقط للصفحات ولكن ليست ضرورية الآن لجميع التعليقات.
         const totalItems = await commentSchema.countDocuments();
         const comments = await commentSchema.find()
             .skip((currentPage - 1) * limit)
@@ -166,7 +166,7 @@ exports.deleteComment = async (req, res, next) => {
 exports.getUserComments = async (req, res, next) => {
     try {
         const currentPage = parseInt(req.query.page) || 1; // الصفحة الحالية (افتراضيًا 1)
-        const limit = parseInt(req.query.limit) || 10; // عدد العناصر في الصفحة (افتراضيًا 10)
+        const limit = parseInt(req.query.limit) || 5; // عدد العناصر في الصفحة (افتراضيًا 10)
 
         // حساب عدد التعليقات للمستخدم
         const totalComments = await commentSchema.find({ userId: req.userData.userId }).countDocuments();
