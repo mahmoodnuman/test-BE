@@ -8,11 +8,11 @@ const fs = require('fs');
 exports.getComments = async (req, res, next) => {
     try {
         const currentPage = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
+        const limit = parseInt(req.query.limit) || 10; // يمكنك تركها فقط للصفحات ولكن ليست ضرورية الآن لجميع التعليقات.
         const totalItems = await commentSchema.countDocuments();
         const comments = await commentSchema.find()
             .skip((currentPage - 1) * limit)
-            .limit(limit)
+            .limit(totalItems) // استرجاع جميع التعليقات
             .sort({ createdAt: -1 })
             .populate('userId', 'username profilePicture');
 
