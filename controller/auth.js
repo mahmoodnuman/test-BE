@@ -125,40 +125,32 @@ exports.register = (req, res, next) => {
 };
 
 
-exports.getUsers = (req , res , next) => {
-    let currentPage = req.query.page,
-    limit = req.query.limit;
-    User.find( {
-        ...res.locals.userfilter ,
-        _id: {
-            $ne:req.userData.userId
-        }
-    }).countDocuments().then(search => {
-        totalItems = search;
-        return User.find({
-            ...res.locals.userfilter ,
-            _id: {
-                $ne:req.userData.userId
-            }
-        }).select('-password').sort({ updatedAt: -1 }).skip((currentPage - 1) * limit).limit(limit)
-       
-    }).then(result => {
-        if (!result) {
-            const error = new Error("No Users Found")
-            error.statusCode = 200;
-            throw error
-        } else {
-            res.status(200).json({
-                users: result,
-                totalItems: totalItems
-            })
-        }
-    }).catch(err => {
-        const error = new Error("No Users Found")
-        error.statusCode = 400
-        throw error
-    })
-}
+exports.getComments = async (req, res, next) => {
+    try {
+        const currentPage = parseInt(req.query.page) || 1; // الصفحة الحالية (افتراضيًا 1)
+        const limit = parseInt(req.query.limit) || 10; // عدد العناصر في الصفحة (افتراضيًا 10)
+
+        // حساب عدد الصفحات
+        const totalComments = await Comment.countDocuments(); // إجمالي عدد التعليقات
+        const totalPages = Math.ceil(totalComments / limit); // عدد الصفحات
+
+        // جلب التعليقات مع التقسيم إلى صفحات
+        const comments = await Comment.find()
+            .skip((currentPage - 1) * limit) // تخطي التعليقات السابقة
+            .limit(limit) // تحديد عدد التعليقات في الصفحة
+            .sort({ createdAt: -1 }); // ترتيب التعليقات من الأحدث إلى الأقدم
+
+        // إرجاع الـ Response
+        res.status(200).json({
+            comments: comments,
+            totalComments: totalComments,
+            totalPages: totalPages,
+            currentPage: currentPage
+        });
+    } catch (err) {
+        next(err); // تمرير الخطأ إلى المعالج التالي
+    }
+};
 
 
 exports.deleteUser = (req, res, next) => {
