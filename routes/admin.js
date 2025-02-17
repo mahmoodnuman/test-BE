@@ -37,7 +37,7 @@ route.post(
 route.put(
     '/edit-comment/:id',
     isAuth,
-    isAdmin, // فقط المسؤول يمكنه تعديل التعليق
+    // isAdmin, // فقط المسؤول يمكنه تعديل التعليق
     [
         body('comment').trim().isLength({ min: 1 }).withMessage('التعليق لا يمكن أن يكون فارغًا')
     ],
@@ -45,6 +45,6 @@ route.put(
 );
 
 // حذف تعليق (مفتوح للمسؤولين فقط)
-route.delete('/delete-comment/:id', isAuth, isAdmin, commentsControllers.deleteComment);
+route.delete('/delete-comment/:id', isAuth, commentsControllers.deleteComment);
 
 module.exports = route;
