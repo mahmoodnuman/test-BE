@@ -164,47 +164,29 @@ exports.deleteComment = async (req, res, next) => {
 };
 
 // الحصول على تعليقات المستخدم
-exports.getUserComments = async (req, res, next) => {
+exports.getComments = async (req, res, next) => {
     try {
-        const currentPage = parseInt(req.query.page) || 1;
-        const limit = parseInt(req.query.limit) || 10;
+        const currentPage = parseInt(req.query.page) || 1; // الصفحة الحالية (افتراضيًا 1)
+        const limit = parseInt(req.query.limit) || 10; // عدد العناصر في الصفحة (افتراضيًا 10)
 
-        // حساب عدد التعليقات
-        const count = await commentSchema.find({ userId: req.userData.userId }).countDocuments();
-        if (!count) {
-            const error = new Error("No Comments Found For This User...");
-            error.statusCode = 404;
-            throw error;
-        }
+        // حساب عدد الصفحات
+        const totalComments = await Comment.countDocuments(); // إجمالي عدد التعليقات
+        const totalPages = Math.ceil(totalComments / limit); // عدد الصفحات
 
-        // استرجاع التعليقات مع التقييمات
-        const comments = await commentSchema.find({ userId: req.userData.userId })
-            .skip((currentPage - 1) * limit)
-            .limit(limit)
-            .sort({ createdAt: -1 })
-            .populate('userId', 'username profilePicture');
+        // جلب التعليقات مع التقسيم إلى صفحات
+        const comments = await Comment.find()
+            .skip((currentPage - 1) * limit) // تخطي التعليقات السابقة
+            .limit(limit) // تحديد عدد التعليقات في الصفحة
+            .sort({ createdAt: -1 }); // ترتيب التعليقات من الأحدث إلى الأقدم
 
-        // إضافة متوسط التقييم لكل تعليق
-        const commentsWithRatings = comments.map(comment => {
-            let totalRating = 0;
-            let averageRating = 0;
-
-            if (comment.ratings.length > 0) {
-                // حساب مجموع التقييمات
-                totalRating = comment.ratings.reduce((sum, rating) => sum + rating.rating, 0);
-                // حساب المتوسط
-                averageRating = totalRating / comment.ratings.length;
-            }
-
-            // إضافة حقل averageRating إلى التعليق
-            return {
-                ...comment.toObject(), // تحويل Mongoose document إلى object عادي
-                averageRating: averageRating.toFixed(2) // تقريب المتوسط إلى منزلتين عشريتين
-            };
+        // إرجاع الـ Response
+        res.status(200).json({
+            comments: comments,
+            totalComments: totalComments,
+            totalPages: totalPages,
+            currentPage: currentPage
         });
-
-        res.status(200).json({ comments: commentsWithRatings });
     } catch (err) {
-        next(err);
+        next(err); // تمرير الخطأ إلى المعالج التالي
     }
 };
