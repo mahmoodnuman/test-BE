@@ -46,8 +46,8 @@
           {
             "in": "query",
             "name": "limit",
-            "required": true,
             "default": 10,
+            "required": true,
             "description": "Number of comments to return per page",
             "schema": {
               "type": "integer"
@@ -80,7 +80,9 @@
             }
           }
         ],
-        "tags": ["Comment"],
+        "tags": [
+          "Comment"
+        ],
         "summary": "Get all comments in the system",
         "responses": {
           "200": {
@@ -104,9 +106,73 @@
         ]
       }
     },
+    "/comment/user-comment/{id}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "ID of the user whose comments are to be retrieved",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "default": 1,
+            "required": true,
+            "description": "Page number for pagination",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "default": 10,
+            "required": true,
+            "description": "Number of comments per page",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "tags": [
+          "Comment"
+        ],
+        "summary": "Get comments for a specific user",
+        "responses": {
+          "200": {
+            "description": "List of comments for the user",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Comment"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/comment/add-comment": {
       "post": {
-        "tags": ["Comment"],
+        "tags": [
+          "Comment"
+        ],
         "summary": "Create a new comment in the system",
         "requestBody": {
           "description": "Comment data",
@@ -143,7 +209,9 @@
     },
     "/comment/add-rating/{commentId}": {
       "post": {
-        "tags": ["Comment"],
+        "tags": [
+          "Comment"
+        ],
         "summary": "Add a rating to a comment",
         "parameters": [
           {
@@ -191,7 +259,9 @@
     },
     "/comment/edit-comment/{id}": {
       "put": {
-        "tags": ["Comment"],
+        "tags": [
+          "Comment"
+        ],
         "summary": "Edit an existing comment",
         "parameters": [
           {
@@ -239,7 +309,9 @@
     },
     "/comment/delete-comment/{id}": {
       "delete": {
-        "tags": ["Comment"],
+        "tags": [
+          "Comment"
+        ],
         "summary": "Delete a specific comment",
         "parameters": [
           {
@@ -269,7 +341,9 @@
     },
     "/auth/login": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Login to the system",
         "requestBody": {
           "description": "Login credentials",
@@ -301,7 +375,9 @@
     },
     "/auth/createAccount": {
       "post": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Create a new user account",
         "requestBody": {
           "description": "User registration data",
@@ -333,7 +409,9 @@
     },
     "/auth/users": {
       "get": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Get all users",
         "parameters": [
           {
@@ -349,8 +427,8 @@
           {
             "in": "query",
             "name": "limit",
-            "required": true,
             "default": 10,
+            "required": true,
             "description": "Number of users per page",
             "schema": {
               "type": "integer"
@@ -379,24 +457,44 @@
         ]
       }
     },
-    "/auth/user-status": {
+    "/auth/user/{id}": {
       "put": {
-        "tags": ["Auth"],
-        "summary": "Change user status",
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Update an existing user",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "ID of the user to update",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "requestBody": {
-          "description": "User status data",
+          "description": "Updated user data",
           "required": true,
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/UserStatus"
+                "$ref": "#/components/schemas/UserUpdate"
               }
             }
           }
         },
         "responses": {
           "200": {
-            "description": "User status changed successfully"
+            "description": "User updated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
           },
           "400": {
             "description": "Bad request, invalid data"
@@ -407,11 +505,11 @@
             "BearerAuth": []
           }
         ]
-      }
-    },
-    "/auth/user/{id}": {
+      },
       "delete": {
-        "tags": ["Auth"],
+        "tags": [
+          "Auth"
+        ],
         "summary": "Delete a user",
         "parameters": [
           {
@@ -430,6 +528,49 @@
           },
           "404": {
             "description": "User not found"
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/auth/user-status/{id}": {
+      "put": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Change user status",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "description": "ID of the user whose status is to be changed",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "User status update data",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UserStatusUpdate"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "User status changed successfully"
+          },
+          "400": {
+            "description": "Bad request, invalid data"
           }
         },
         "security": [
@@ -464,6 +605,9 @@
             "items": {
               "$ref": "#/components/schemas/Rating"
             }
+          },
+          "averageRating": {
+            "type": "number"
           }
         }
       },
@@ -489,7 +633,11 @@
           "password": {
             "type": "string"
           }
-        }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
       },
       "LoginResponse": {
         "type": "object",
@@ -525,7 +673,13 @@
           },
           "role": {
             "type": "string",
-            "enum": ["user", "admin"]
+            "enum": [
+              "user",
+              "admin"
+            ]
+          },
+          "isActive": {
+            "type": "boolean"
           },
           "createdAt": {
             "type": "string",
@@ -545,9 +699,58 @@
           },
           "status": {
             "type": "string",
-            "enum": ["Active", "In-Active"]
+            "enum": [
+              "Active",
+              "In-Active"
+            ]
           }
         }
+      },
+      "UserStatusUpdate": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "Active",
+              "In-Active"
+            ]
+          }
+        },
+        "required": [
+          "status"
+        ]
+      },
+      "UserUpdate": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "firstName": {
+            "type": "string"
+          },
+          "lastName": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "admin"
+            ]
+          }
+        },
+        "required": [
+          "email",
+          "username",
+          "firstName",
+          "lastName",
+          "role"
+        ]
       }
     },
     "securitySchemes": {

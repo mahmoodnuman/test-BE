@@ -6,13 +6,12 @@ const isAdmin = require('../middleware/isAdmin'); // تأكد من المسار 
 const route = express.Router();
 const { body } = require('express-validator');
 
-// الحصول على جميع التعليقات (مفتوح للمستخدمين والمسؤولين)
+
 route.get('/all-comment', isAuth, commentsFilter.filter, commentsControllers.getComments);
 
-// الحصول على تعليقات مستخدم معين (مفتوح للمستخدمين والمسؤولين)
 route.get('/user-comment/:id', isAuth, commentsFilter.filter, commentsControllers.getUserComments);
 
-// إضافة تعليق جديد (مفتوح للمستخدمين فقط)
+
 route.post(
     '/add-comment',
     isAuth,
@@ -33,18 +32,16 @@ route.post(
     commentsControllers.addRating
 );
 
-// تعديل تعليق (مفتوح للمسؤولين فقط)
+
 route.put(
     '/edit-comment/:id',
     isAuth,
-    // isAdmin, // فقط المسؤول يمكنه تعديل التعليق
     [
         body('comment').trim().isLength({ min: 1 }).withMessage('التعليق لا يمكن أن يكون فارغًا')
     ],
     commentsControllers.editComment
 );
 
-// حذف تعليق (مفتوح للمسؤولين فقط)
 route.delete('/delete-comment/:id', isAuth, commentsControllers.deleteComment);
 
 module.exports = route;
