@@ -8,8 +8,6 @@ const DBConcction = callback => {
         // تنفيذ الكولباك بعد الاتصال الناجح
         callback();
 
-        // عرض رابط الـ localhost في الـ console بعد الاتصال الناجح
-        console.log(`Server is running on http://localhost:${process.env.PORT || 5000}`);
     })
     .catch(err => {
         console.log("Error connecting to DB:", err);

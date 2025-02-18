@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:8080",
+      "url": "https://comments-akyu.onrender.com",
       "description": "Local Development"
     },
     {
