@@ -166,10 +166,14 @@ exports.deleteComment = async (req, res, next) => {
 exports.getUserComments = async (req, res, next) => {
     try {
         const currentPage = parseInt(req.query.page) || 1; // الصفحة الحالية (افتراضيًا 1)
-        const limit = parseInt(req.query.limit) || 5; // عدد العناصر في الصفحة (افتراضيًا 10)
+        const limit = parseInt(req.query.limit) || 5; // عدد العناصر في الصفحة (افتراضيًا 5)
 
-        // حساب عدد التعليقات للمستخدم
-        const totalComments = await commentSchema.find({ userId: req.userData.userId }).countDocuments();
+        // إذا تم إرسال معاملة "user" عبر الـ query، يتم استخدامها للفلترة،
+        // وإلا يتم استخدام userId الخاص بالمستخدم من الـ token
+        const filterUserId = req.query.user ? req.query.user : req.userData.userId;
+
+        // حساب عدد التعليقات للفلتر المحدد
+        const totalComments = await commentSchema.find({ userId: filterUserId }).countDocuments();
         const totalPages = Math.ceil(totalComments / limit); // عدد الصفحات
 
         if (totalComments === 0) {
@@ -178,8 +182,8 @@ exports.getUserComments = async (req, res, next) => {
             throw error;
         }
 
-        // استرجاع التعليقات مع التقييمات للمستخدم المحدد
-        const comments = await commentSchema.find({ userId: req.userData.userId })
+        // استرجاع التعليقات مع التقييمات للفلتر المحدد
+        const comments = await commentSchema.find({ userId: filterUserId })
             .skip((currentPage - 1) * limit) // تخطي التعليقات السابقة
             .limit(limit) // تحديد عدد التعليقات في الصفحة
             .sort({ createdAt: -1 }) // ترتيب التعليقات من الأحدث إلى الأقدم
@@ -190,7 +194,7 @@ exports.getUserComments = async (req, res, next) => {
             let totalRating = 0;
             let averageRating = 0;
 
-            if (comment.ratings.length > 0) {
+            if (comment.ratings && comment.ratings.length > 0) {
                 // حساب مجموع التقييمات
                 totalRating = comment.ratings.reduce((sum, rating) => sum + rating.rating, 0);
                 // حساب المتوسط
