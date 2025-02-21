@@ -7,9 +7,9 @@ const route = express.Router();
 const { body } = require('express-validator');
 
 
-route.get('/all-comment', isAuth, commentsFilter.filter, commentsControllers.getComments);
+    route.get('/all-comment', isAuth, commentsFilter.filter, commentsControllers.getComments);
 
-route.get('/user-comment/:id', isAuth, commentsFilter.filter, commentsControllers.getUserComments);
+    route.get('/user-comment/:id', isAuth, commentsFilter.filter, commentsControllers.getUserComments);
 
 
 route.post(

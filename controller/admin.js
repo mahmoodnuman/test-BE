@@ -58,6 +58,7 @@ exports.createComment = async (req, res, next) => {
         const newComment = new commentSchema({
             comment: req.body.comment,
             userId: req.userData.userId,
+            userName: req.userData.userName,
             createdAt: Date.now(),
         });
 
@@ -166,7 +167,7 @@ exports.deleteComment = async (req, res, next) => {
 exports.getUserComments = async (req, res, next) => {
     try {
         const currentPage = parseInt(req.query.page) || 1; // الصفحة الحالية (افتراضيًا 1)
-        const limit = parseInt(req.query.limit) || 5; // عدد العناصر في الصفحة (افتراضيًا 5)
+        const limit = parseInt(req.query.limit); // عدد العناصر في الصفحة (افتراضيًا 5)
 
         // إذا تم إرسال معاملة "user" عبر الـ query، يتم استخدامها للفلترة،
         // وإلا يتم استخدام userId الخاص بالمستخدم من الـ token
