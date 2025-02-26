@@ -149,33 +149,29 @@ exports.editComment = async (req, res, next) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // إضافة النص "Edited by Admin" إلى التعليق
-        const adminMessage = ` (Edited by Admin: ${user.username})`;
-
-        // تحديث التعليق وإضافة الرسالة
+        // تحديث التعليق في قاعدة البيانات بدون تعديل المحتوى الأصلي
         const result = await commentSchema.findByIdAndUpdate(
-            commentId,  // معرّف التعليق الذي سيتم تحديثه
-            { 
-                comment: updatedComment + adminMessage,  // إضافة الرسالة إلى التعليق
-                username: user.username  // تحديث اسم المستخدم
-            },
-            { new: true }  // لضمان إرجاع النسخة الجديدة من التعليق
-        ).populate('userId', 'username profilePicture');  // لجلب بيانات المستخدم المرتبط بالتعليق
+            commentId,
+            { comment: updatedComment }, // تحديث نص التعليق فقط
+            { new: true }
+        ).populate('userId', 'username profilePicture');
 
         if (!result) {
-            const error = new Error("No Comment Found With This ID...");
-            error.statusCode = 404;
-            throw error;
+            return res.status(404).json({ message: "No Comment Found With This ID..." });
         }
 
+        // إرجاع التعليق مع إضافة "Edited by" كحقل منفصل
         res.status(200).json({
             message: "Comment Updated Successfully",
-            comment: result
+            comment: result,
+            editedBy: `Edited by Admin: ${user.username}` // إرجاع اسم الأدمن بشكل منفصل
         });
+
     } catch (err) {
         next(err);
     }
 };
+
 
 
 
