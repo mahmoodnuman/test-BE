@@ -55,12 +55,19 @@ exports.createComment = async (req, res, next) => {
     }
 
     try {
+        const user = await userSchema.findById(req.userData.userId).select("username email profilePicture");
+        
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+
         const newComment = new commentSchema({
             comment: req.body.comment,
             userId: req.userData.userId,
-            userName: req.userData.userName,
+            username: user.username,
             createdAt: Date.now(),
         });
+        console.log(user);
 
         await newComment.save();
         res.status(201).json({
@@ -71,6 +78,7 @@ exports.createComment = async (req, res, next) => {
         next(err);
     }
 };
+
 
 // إضافة تقييم للتعليق
 exports.addRating = async (req, res, next) => {
