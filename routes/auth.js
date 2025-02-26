@@ -30,6 +30,30 @@ route.post('/login',
     body('role').trim().notEmpty().withMessage("Role is required."),
     authControllers.updateUser
   );
+
+  // في ملف routes/users.js
+
+route.get('/user/:id', isAuth, async (req, res) => {
+    try {
+        const userId = req.params.id;  // استخراج userId من الـ URL
+        const user = await User.findById(userId);  // البحث عن المستخدم باستخدام الـ userId
+        
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // إرجاع بيانات المستخدم
+        res.status(200).json({
+            _id: user._id,
+            username: user.username,  // يمكن إضافة المزيد من البيانات إذا لزم الأمر
+            profilePicture: user.profilePicture
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: 'Error fetching user data' });
+    }
+});
+
   
  
  // عرض المستخدمين
