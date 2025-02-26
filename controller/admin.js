@@ -142,17 +142,23 @@ exports.editComment = async (req, res, next) => {
     try {
         const commentId = req.params.id;
         const updatedComment = req.body.comment;
-        
+
         // جلب بيانات المستخدم الذي يقوم بالتعديل
         const user = await userSchema.findById(req.userData.userId).select("username profilePicture");
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // تحديث التعليق وإرجاع النسخة الجديدة مع تحديث حقل username
+        // إضافة النص "Edited by Admin" إلى التعليق
+        const adminMessage = ` (Edited by Admin: ${user.username})`;
+
+        // تحديث التعليق وإضافة الرسالة
         const result = await commentSchema.findByIdAndUpdate(
             commentId,
-            { comment: updatedComment, username: user.username },
+            { 
+                comment: updatedComment + adminMessage, // إضافة الرسالة إلى التعليق
+                username: user.username 
+            },
             { new: true }
         ).populate('userId', 'username profilePicture');
 
@@ -170,6 +176,7 @@ exports.editComment = async (req, res, next) => {
         next(err);
     }
 };
+
 
 
 // حذف تعليق
