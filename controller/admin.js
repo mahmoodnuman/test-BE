@@ -70,6 +70,10 @@ exports.createComment = async (req, res, next) => {
         console.log(user);
 
         await newComment.save();
+
+        // استخدم populate لاسترجاع بيانات المستخدم بالتفصيل
+        await newComment.populate('userId', 'username profilePicture');
+
         res.status(201).json({
             message: "Comment Created Successfully",
             comment: newComment
@@ -78,6 +82,7 @@ exports.createComment = async (req, res, next) => {
         next(err);
     }
 };
+
 
 
 // إضافة تقييم للتعليق
@@ -125,7 +130,6 @@ exports.addRating = async (req, res, next) => {
     }
 };
 
-// تعديل تعليق (مفتوح للمسؤولين فقط)
 exports.editComment = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -138,8 +142,20 @@ exports.editComment = async (req, res, next) => {
     try {
         const commentId = req.params.id;
         const updatedComment = req.body.comment;
+        
+        // جلب بيانات المستخدم الذي يقوم بالتعديل
+        const user = await userSchema.findById(req.userData.userId).select("username profilePicture");
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
 
-        const result = await commentSchema.findByIdAndUpdate(commentId, { comment: updatedComment }, { new: true });
+        // تحديث التعليق وإرجاع النسخة الجديدة مع تحديث حقل username
+        const result = await commentSchema.findByIdAndUpdate(
+            commentId,
+            { comment: updatedComment, username: user.username },
+            { new: true }
+        ).populate('userId', 'username profilePicture');
+
         if (!result) {
             const error = new Error("No Comment Found With This ID...");
             error.statusCode = 404;
@@ -154,6 +170,7 @@ exports.editComment = async (req, res, next) => {
         next(err);
     }
 };
+
 
 // حذف تعليق
 exports.deleteComment = async (req, res, next) => {
