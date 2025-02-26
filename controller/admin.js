@@ -154,13 +154,13 @@ exports.editComment = async (req, res, next) => {
 
         // تحديث التعليق وإضافة الرسالة
         const result = await commentSchema.findByIdAndUpdate(
-            commentId,
+            commentId,  // معرّف التعليق الذي سيتم تحديثه
             { 
-                comment: updatedComment + adminMessage, // إضافة الرسالة إلى التعليق
-                username: user.username 
+                comment: updatedComment + adminMessage,  // إضافة الرسالة إلى التعليق
+                username: user.username  // تحديث اسم المستخدم
             },
-            { new: true }
-        ).populate('userId', 'username profilePicture');
+            { new: true }  // لضمان إرجاع النسخة الجديدة من التعليق
+        ).populate('userId', 'username profilePicture');  // لجلب بيانات المستخدم المرتبط بالتعليق
 
         if (!result) {
             const error = new Error("No Comment Found With This ID...");
