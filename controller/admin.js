@@ -129,7 +129,6 @@ exports.addRating = async (req, res, next) => {
         next(err);
     }
 };
-
 exports.editComment = async (req, res, next) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -149,14 +148,14 @@ exports.editComment = async (req, res, next) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // إضافة النص "Edited by Admin" إلى التعليق
-        const adminMessage = ` (Edited by Admin: ${user.username})`;
+        // إعداد الرسالة التي تُظهر أن التعليق تم تعديله بواسطة الأدمن
+        const adminMessage = `Edited by Admin: ${user.username}`;
 
-        // تحديث التعليق وإضافة الرسالة
+        // تحديث التعليق دون دمج الرسالة داخله
         const result = await commentSchema.findByIdAndUpdate(
             commentId,
             { 
-                comment: updatedComment + adminMessage, // إضافة الرسالة إلى التعليق
+                comment: updatedComment, // نص التعليق الجديد بدون الرسالة
                 username: user.username 
             },
             { new: true }
@@ -168,9 +167,11 @@ exports.editComment = async (req, res, next) => {
             throw error;
         }
 
+        // إعادة التعليق مع الرسالة كحقل منفصل
         res.status(200).json({
             message: "Comment Updated Successfully",
-            comment: result
+            comment: result,
+            adminMessage: adminMessage
         });
     } catch (err) {
         next(err);
