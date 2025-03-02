@@ -162,9 +162,7 @@ exports.editComment = async (req, res, next) => {
         ).populate('userId', 'username profilePicture');
 
         if (!result) {
-            const error = new Error("No Comment Found With This ID...");
-            error.statusCode = 404;
-            throw error;
+            return res.status(404).json({ message: "No Comment Found With This ID..." });
         }
 
         // إعادة التعليق مع الرسالة كحقل منفصل
@@ -173,10 +171,12 @@ exports.editComment = async (req, res, next) => {
             comment: result,
             adminMessage: adminMessage
         });
+
     } catch (err) {
         next(err);
     }
 };
+
 
 
 
